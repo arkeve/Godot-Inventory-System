@@ -1,0 +1,34 @@
+[remap]
+
+importer="texture"
+type="StreamTexture"
+path="res://.import/default_inventory_background.png-ae96844e58e7693372d73592e1caa186.stex"
+metadata={
+"vram_texture": false
+}
+
+[deps]
+
+source_file="res://default_inventory_background.png"
+dest_files=[ "res://.import/default_inventory_background.png-ae96844e58e7693372d73592e1caa186.stex" ]
+
+[params]
+
+compress/mode=0
+compress/lossy_quality=0.7
+compress/hdr_mode=0
+compress/bptc_ldr=0
+compress/normal_map=0
+flags/repeat=0
+flags/filter=false
+flags/mipmaps=false
+flags/anisotropic=false
+flags/srgb=2
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/HDR_as_SRGB=false
+process/invert_color=false
+stream=false
+size_limit=0
+detect_3d=false
+svg/scale=1.0
