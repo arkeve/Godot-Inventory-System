@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Iron Sword.png-618daba819fdf723345cca664e3ff151.stex"
+path="res://.import/Tree Branch.png-50208dc4508d6897eabd26619ccb6dd9.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Iron Sword.png"
-dest_files=[ "res://.import/Iron Sword.png-618daba819fdf723345cca664e3ff151.stex" ]
+source_file="res://item_icons/Tree Branch.png"
+dest_files=[ "res://.import/Tree Branch.png-50208dc4508d6897eabd26619ccb6dd9.stex" ]
 
 [params]
 
