@@ -8,6 +8,7 @@ var empty_style: StyleBoxTexture = null
 
 var ItemClass = preload("res://Item.tscn")
 var item = null
+var slot_index
 
 func _ready():
 	default_style = StyleBoxTexture.new()

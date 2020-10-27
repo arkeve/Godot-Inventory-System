@@ -16,6 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="InventorySystem"
+run/main_scene="res://World.tscn"
 
 [autoload]
 
