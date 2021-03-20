@@ -11,6 +11,11 @@ var inventory = {
 	3: ["Slime Potion", 45],
 }
 
+var hotbar = {
+	0: ["Iron Sword", 1],  #--> slot_index: [item_name, item_quantity]
+	3: ["Slime Potion", 45],
+}
+
 func add_item(item_name, item_quantity):
 	var slot_indices: Array = inventory.keys()
 	slot_indices.sort()
