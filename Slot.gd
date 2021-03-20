@@ -43,16 +43,20 @@ func refresh_style():
 		
 func pickFromSlot():
 	remove_child(item)
-	var inventoryNode = find_parent("Inventory")
-	inventoryNode.add_child(item)
+	if find_parent("Inventory") != null:
+		find_parent("Inventory").add_child(item)
+	else:
+		find_parent("Hotbar").add_child(item)
 	item = null
 	refresh_style()
 	
 func putIntoSlot(new_item):
 	item = new_item
 	item.position = Vector2(0, 0)
-	var inventoryNode = find_parent("Inventory")
-	inventoryNode.remove_child(item)
+	if find_parent("Inventory") != null:
+		find_parent("Inventory").remove_child(item)
+	else:
+		find_parent("Hotbar").remove_child(item)
 	add_child(item)
 	refresh_style()
 	
