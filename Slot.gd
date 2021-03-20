@@ -43,20 +43,14 @@ func refresh_style():
 		
 func pickFromSlot():
 	remove_child(item)
-	if find_parent("Inventory") != null:
-		find_parent("Inventory").add_child(item)
-	else:
-		find_parent("Hotbar").add_child(item)
+	find_parent("UserInterface").add_child(item)
 	item = null
 	refresh_style()
 	
 func putIntoSlot(new_item):
 	item = new_item
 	item.position = Vector2(0, 0)
-	if find_parent("Inventory") != null:
-		find_parent("Inventory").remove_child(item)
-	else:
-		find_parent("Hotbar").remove_child(item)
+	find_parent("UserInterface").remove_child(item)
 	add_child(item)
 	refresh_style()
 	
