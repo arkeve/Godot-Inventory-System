@@ -8,6 +8,10 @@ func _ready():
 #	for i in range(slots.size()):
 #		slots[i].connect("gui_input", self, "slot_gui_input", [slots[i]])
 #		slots[i].slot_index = i
+	for i in range(slots.size()):
+		PlayerInventory.connect("active_item_updated", slots[i], "refresh_style")
+		slots[i].slotType = SlotClass.SlotType.HOTBAR
+		slots[i].slot_index = i
 	initialize_hotbar()
 
 func initialize_hotbar():
