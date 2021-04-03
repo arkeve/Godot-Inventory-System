@@ -21,6 +21,7 @@ var hotbar = {
 	3: ["Slime Potion", 45],
 }
 
+# TODO: First try to add to hotbar
 func add_item(item_name, item_quantity):
 	var slot_indices: Array = inventory.keys()
 	slot_indices.sort()
@@ -44,6 +45,7 @@ func add_item(item_name, item_quantity):
 			update_slot_visual(i, inventory[i][0], inventory[i][1])
 			return
 
+# TODO: Make compatible with hotbar as well
 func update_slot_visual(slot_index, item_name, new_quantity):
 	var slot = get_tree().root.get_node("/root/World/UserInterface/Inventory/GridContainer/Slot" + str(slot_index + 1))
 	if slot.item != null:
@@ -51,14 +53,23 @@ func update_slot_visual(slot_index, item_name, new_quantity):
 	else:
 		slot.initialize_item(item_name, new_quantity)
 
-func remove_item(slot: SlotClass):
-	inventory.erase(slot.slot_index)
+func remove_item(slot: SlotClass, is_hotbar: bool = false):
+	if is_hotbar:
+		hotbar.erase(slot.slot_index)
+	else:
+		inventory.erase(slot.slot_index)
 
-func add_item_to_empty_slot(item: ItemClass, slot: SlotClass):
-	inventory[slot.slot_index] = [item.item_name, item.item_quantity]
+func add_item_to_empty_slot(item: ItemClass, slot: SlotClass, is_hotbar: bool = false):
+	if is_hotbar:
+		hotbar[slot.slot_index] = [item.item_name, item.item_quantity]
+	else:
+		inventory[slot.slot_index] = [item.item_name, item.item_quantity]
 
-func add_item_quantity(slot: SlotClass, quantity_to_add: int):
-	inventory[slot.slot_index][1] += quantity_to_add
+func add_item_quantity(slot: SlotClass, quantity_to_add: int, is_hotbar: bool = false):
+	if is_hotbar:
+		hotbar[slot.slot_index][1] += quantity_to_add
+	else:
+		inventory[slot.slot_index][1] += quantity_to_add
 
 ###
 ### Hotbar Related Functions
