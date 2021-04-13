@@ -9,13 +9,14 @@ func _ready():
 #	for i in range(slots.size()):
 #		slots[i].connect("gui_input", self, "slot_gui_input", [slots[i]])
 #		slots[i].slot_index = i
+	PlayerInventory.connect("active_item_updated", self, "update_active_item_label")
 	for i in range(slots.size()):
 		PlayerInventory.connect("active_item_updated", slots[i], "refresh_style")
-		PlayerInventory.connect("active_item_updated", self, "update_active_item_label")
 		slots[i].connect("gui_input", self, "slot_gui_input", [slots[i]])
 		slots[i].slotType = SlotClass.SlotType.HOTBAR
 		slots[i].slot_index = i
 	initialize_hotbar()
+	update_active_item_label()
 
 func update_active_item_label():
 	if slots[PlayerInventory.active_item_slot].item != null:
