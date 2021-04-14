@@ -2,6 +2,7 @@ extends Node2D
 
 const SlotClass = preload("res://Slot.gd")
 onready var inventory_slots = $GridContainer
+onready var equip_slots = $EquipSlots.get_children()
 
 func _ready():
 	var slots = inventory_slots.get_children()
@@ -9,13 +10,27 @@ func _ready():
 		slots[i].connect("gui_input", self, "slot_gui_input", [slots[i]])
 		slots[i].slot_index = i
 		slots[i].slotType = SlotClass.SlotType.INVENTORY
+	
+	for i in range(equip_slots.size()):
+		equip_slots[i].connect("gui_input", self, "slot_gui_input", [equip_slots[i]])
+		equip_slots[i].slot_index = i
+	equip_slots[0].slotType = SlotClass.SlotType.SHIRT
+	equip_slots[1].slotType = SlotClass.SlotType.PANTS
+	equip_slots[2].slotType = SlotClass.SlotType.SHOES
+	
 	initialize_inventory()
+	initialize_equips()
 
 func initialize_inventory():
 	var slots = inventory_slots.get_children()
 	for i in range(slots.size()):
 		if PlayerInventory.inventory.has(i):
 			slots[i].initialize_item(PlayerInventory.inventory[i][0], PlayerInventory.inventory[i][1])
+
+func initialize_equips():
+	for i in range(equip_slots.size()):
+		if PlayerInventory.equips.has(i):
+			equip_slots[i].initialize_item(PlayerInventory.equips[i][0], PlayerInventory.equips[i][1])
 
 func slot_gui_input(event: InputEvent, slot: SlotClass):
 	if event is InputEventMouseButton:
