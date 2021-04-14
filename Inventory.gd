@@ -49,33 +49,49 @@ func slot_gui_input(event: InputEvent, slot: SlotClass):
 func _input(event):
 	if find_parent("UserInterface").holding_item:
 		find_parent("UserInterface").holding_item.global_position = get_global_mouse_position()
-		
+	
+func able_to_put_in_slot(slot: SlotClass):
+	var holding_item = find_parent("UserInterface").holding_item
+	if holding_item == null:
+		return true
+	var holding_item_category = JsonData.item_data[holding_item.item_name]["ItemCategory"]
+	if slot.slotType == SlotClass.SlotType.SHIRT:
+		return holding_item_category == "Shirt"
+	elif slot.slotType == SlotClass.SlotType.PANTS:
+		return holding_item_category == "Pants"
+	elif slot.slotType == SlotClass.SlotType.SHOES:
+		return holding_item_category == "Shoes"
+	return true
+	
 func left_click_empty_slot(slot: SlotClass):
-	PlayerInventory.add_item_to_empty_slot(find_parent("UserInterface").holding_item, slot)
-	slot.putIntoSlot(find_parent("UserInterface").holding_item)
-	find_parent("UserInterface").holding_item = null
+	if able_to_put_in_slot(slot):
+		PlayerInventory.add_item_to_empty_slot(find_parent("UserInterface").holding_item, slot)
+		slot.putIntoSlot(find_parent("UserInterface").holding_item)
+		find_parent("UserInterface").holding_item = null
 	
 func left_click_different_item(event: InputEvent, slot: SlotClass):
-	PlayerInventory.remove_item(slot)
-	PlayerInventory.add_item_to_empty_slot(find_parent("UserInterface").holding_item, slot)
-	var temp_item = slot.item
-	slot.pickFromSlot()
-	temp_item.global_position = event.global_position
-	slot.putIntoSlot(find_parent("UserInterface").holding_item)
-	find_parent("UserInterface").holding_item = temp_item
+	if able_to_put_in_slot(slot):
+		PlayerInventory.remove_item(slot)
+		PlayerInventory.add_item_to_empty_slot(find_parent("UserInterface").holding_item, slot)
+		var temp_item = slot.item
+		slot.pickFromSlot()
+		temp_item.global_position = event.global_position
+		slot.putIntoSlot(find_parent("UserInterface").holding_item)
+		find_parent("UserInterface").holding_item = temp_item
 
 func left_click_same_item(slot: SlotClass):
-	var stack_size = int(JsonData.item_data[slot.item.item_name]["StackSize"])
-	var able_to_add = stack_size - slot.item.item_quantity
-	if able_to_add >= find_parent("UserInterface").holding_item.item_quantity:
-		PlayerInventory.add_item_quantity(slot, find_parent("UserInterface").holding_item.item_quantity)
-		slot.item.add_item_quantity(find_parent("UserInterface").holding_item.item_quantity)
-		find_parent("UserInterface").holding_item.queue_free()
-		find_parent("UserInterface").holding_item = null
-	else:
-		PlayerInventory.add_item_quantity(slot, able_to_add)
-		slot.item.add_item_quantity(able_to_add)
-		find_parent("UserInterface").holding_item.decrease_item_quantity(able_to_add)
+	if able_to_put_in_slot(slot):
+		var stack_size = int(JsonData.item_data[slot.item.item_name]["StackSize"])
+		var able_to_add = stack_size - slot.item.item_quantity
+		if able_to_add >= find_parent("UserInterface").holding_item.item_quantity:
+			PlayerInventory.add_item_quantity(slot, find_parent("UserInterface").holding_item.item_quantity)
+			slot.item.add_item_quantity(find_parent("UserInterface").holding_item.item_quantity)
+			find_parent("UserInterface").holding_item.queue_free()
+			find_parent("UserInterface").holding_item = null
+		else:
+			PlayerInventory.add_item_quantity(slot, able_to_add)
+			slot.item.add_item_quantity(able_to_add)
+			find_parent("UserInterface").holding_item.decrease_item_quantity(able_to_add)
 		
 func left_click_not_holding(slot: SlotClass):
 	PlayerInventory.remove_item(slot)
