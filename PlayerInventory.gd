@@ -21,6 +21,12 @@ var hotbar = {
 	3: ["Slime Potion", 45],
 }
 
+var equips = {
+	0: ["Brown Shirt", 1],  #--> slot_index: [item_name, item_quantity]
+	1: ["Blue Jeans", 1],  #--> slot_index: [item_name, item_quantity]
+	2: ["Brown Boots", 1],	
+}
+
 # TODO: First try to add to hotbar
 func add_item(item_name, item_quantity):
 	var slot_indices: Array = inventory.keys()
@@ -53,23 +59,32 @@ func update_slot_visual(slot_index, item_name, new_quantity):
 	else:
 		slot.initialize_item(item_name, new_quantity)
 
-func remove_item(slot: SlotClass, is_hotbar: bool = false):
-	if is_hotbar:
-		hotbar.erase(slot.slot_index)
-	else:
-		inventory.erase(slot.slot_index)
+func remove_item(slot: SlotClass):
+	match slot.SlotType:
+		SlotClass.SlotType.HOTBAR:
+			hotbar.erase(slot.slot_index)
+		SlotClass.SlotType.INVENTORY:
+			inventory.erase(slot.slot_index)
+		_:
+			equips.erase(slot.slot_index)
 
-func add_item_to_empty_slot(item: ItemClass, slot: SlotClass, is_hotbar: bool = false):
-	if is_hotbar:
-		hotbar[slot.slot_index] = [item.item_name, item.item_quantity]
-	else:
-		inventory[slot.slot_index] = [item.item_name, item.item_quantity]
+func add_item_to_empty_slot(item: ItemClass, slot: SlotClass):
+	match slot.SlotType:
+		SlotClass.SlotType.HOTBAR:
+			hotbar[slot.slot_index] = [item.item_name, item.item_quantity]
+		SlotClass.SlotType.INVENTORY:
+			inventory[slot.slot_index] = [item.item_name, item.item_quantity]
+		_:
+			equips[slot.slot_index] = [item.item_name, item.item_quantity]
 
-func add_item_quantity(slot: SlotClass, quantity_to_add: int, is_hotbar: bool = false):
-	if is_hotbar:
-		hotbar[slot.slot_index][1] += quantity_to_add
-	else:
-		inventory[slot.slot_index][1] += quantity_to_add
+func add_item_quantity(slot: SlotClass, quantity_to_add: int):
+	match slot.SlotType:
+		SlotClass.SlotType.HOTBAR:
+			hotbar[slot.slot_index][1] += quantity_to_add
+		SlotClass.SlotType.INVENTORY:
+			inventory[slot.slot_index][1] += quantity_to_add
+		_:
+			equips[slot.slot_index][1] += quantity_to_add
 
 ###
 ### Hotbar Related Functions
