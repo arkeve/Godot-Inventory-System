@@ -1,11 +1,18 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://default_inventory_background.png" type="Texture" id=1]
 [ext_resource path="res://item_slot_default_background.png" type="Texture" id=2]
 [ext_resource path="res://Slot.gd" type="Script" id=3]
 [ext_resource path="res://Inventory.gd" type="Script" id=4]
+[ext_resource path="res://images/ShoesOverlay.png" type="Texture" id=5]
+[ext_resource path="res://images/ShirtOverlay.png" type="Texture" id=6]
+[ext_resource path="res://images/PantsOverlay.png" type="Texture" id=7]
 
 [sub_resource type="StyleBoxTexture" id=1]
+texture = ExtResource( 2 )
+region_rect = Rect2( 0, 0, 18, 18 )
+
+[sub_resource type="StyleBoxTexture" id=2]
 texture = ExtResource( 2 )
 region_rect = Rect2( 0, 0, 18, 18 )
 
@@ -204,3 +211,65 @@ margin_bottom = 84.0
 rect_min_size = Vector2( 18, 18 )
 custom_styles/panel = SubResource( 1 )
 script = ExtResource( 3 )
+
+[node name="EquipSlots" type="GridContainer" parent="."]
+margin_left = 174.079
+margin_top = 111.787
+margin_right = 192.079
+margin_bottom = 173.787
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ShirtSlot" type="Panel" parent="EquipSlots"]
+margin_right = 18.0
+margin_bottom = 18.0
+rect_min_size = Vector2( 18, 18 )
+custom_styles/panel = SubResource( 2 )
+script = ExtResource( 3 )
+
+[node name="TextureRect" type="TextureRect" parent="EquipSlots/ShirtSlot"]
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 17.0
+margin_bottom = 17.0
+texture = ExtResource( 6 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PantsSlot" type="Panel" parent="EquipSlots"]
+margin_top = 22.0
+margin_right = 18.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 18, 18 )
+custom_styles/panel = SubResource( 2 )
+script = ExtResource( 3 )
+
+[node name="TextureRect" type="TextureRect" parent="EquipSlots/PantsSlot"]
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 17.0
+margin_bottom = 17.0
+texture = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ShoesSlot" type="Panel" parent="EquipSlots"]
+margin_top = 44.0
+margin_right = 18.0
+margin_bottom = 62.0
+rect_min_size = Vector2( 18, 18 )
+custom_styles/panel = SubResource( 2 )
+script = ExtResource( 3 )
+
+[node name="TextureRect" type="TextureRect" parent="EquipSlots/ShoesSlot"]
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 17.0
+margin_bottom = 17.0
+texture = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
