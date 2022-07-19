@@ -2,9 +2,10 @@ extends Node
 
 signal active_item_updated
 
-const SlotClass = preload("res://Slot.gd")
+const SlotTypes = preload("res://scripts/slot-type-enum.gd")
+const Common = preload("res://scenes/slot/slot.gd")
 const ItemClass = preload("res://Item.gd")
-const NUM_INVENTORY_SLOTS = 20
+const NUM__inventoryGrid = 20
 const NUM_HOTBAR_SLOTS = 8
 
 var active_item_slot = 0
@@ -45,7 +46,7 @@ func add_item(item_name, item_quantity):
 				item_quantity = item_quantity - able_to_add
 	
 	# item doesn't exist in inventory yet, so add it to an empty slot
-	for i in range(NUM_INVENTORY_SLOTS):
+	for i in range(NUM__inventoryGrid):
 		if inventory.has(i) == false:
 			inventory[i] = [item_name, item_quantity]
 			update_slot_visual(i, inventory[i][0], inventory[i][1])
@@ -59,29 +60,29 @@ func update_slot_visual(slot_index, item_name, new_quantity):
 	else:
 		slot.initialize_item(item_name, new_quantity)
 
-func remove_item(slot: SlotClass):
+func remove_item(slot: Slot):
 	match slot.slotType:
-		SlotClass.SlotType.HOTBAR:
+		SlotTypes.HOTBAR:
 			hotbar.erase(slot.slot_index)
-		SlotClass.SlotType.INVENTORY:
+		SlotTypes.INVENTORY:
 			inventory.erase(slot.slot_index)
 		_:
 			equips.erase(slot.slot_index)
 
-func add_item_to_empty_slot(item: ItemClass, slot: SlotClass):
+func add_item_to_empty_slot(item: ItemClass, slot: Slot):
 	match slot.slotType:
-		SlotClass.SlotType.HOTBAR:
+		SlotTypes.HOTBAR:
 			hotbar[slot.slot_index] = [item.item_name, item.item_quantity]
-		SlotClass.SlotType.INVENTORY:
+		SlotTypes.INVENTORY:
 			inventory[slot.slot_index] = [item.item_name, item.item_quantity]
 		_:
 			equips[slot.slot_index] = [item.item_name, item.item_quantity]
 
-func add_item_quantity(slot: SlotClass, quantity_to_add: int):
+func add_item_quantity(slot: Slot, quantity_to_add: int):
 	match slot.slotType:
-		SlotClass.SlotType.HOTBAR:
+		SlotTypes.HOTBAR:
 			hotbar[slot.slot_index][1] += quantity_to_add
-		SlotClass.SlotType.INVENTORY:
+		SlotTypes.INVENTORY:
 			inventory[slot.slot_index][1] += quantity_to_add
 		_:
 			equips[slot.slot_index][1] += quantity_to_add

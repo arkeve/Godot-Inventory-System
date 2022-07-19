@@ -8,8 +8,14 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Panel",
+"class": "Slot",
+"language": "GDScript",
+"path": "res://scenes/slot/slot.gd"
+} ]
 _global_script_class_icons={
+"Slot": ""
 }
 
 [application]
@@ -21,6 +27,14 @@ run/main_scene="res://World.tscn"
 
 JsonData="*res://JSONData.gd"
 PlayerInventory="*res://PlayerInventory.gd"
+Common="*res://singletons/common.gd"
+Signals="*res://singletons/signals.gd"
+InventoryManager="*res://singletons/inventory_manager.gd"
+
+[debug]
+
+gdscript/warnings/unused_signal=false
+gdscript/warnings/return_value_discarded=false
 
 [display]
 

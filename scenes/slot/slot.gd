@@ -1,4 +1,7 @@
 extends Panel
+class_name Slot
+
+const SlotTypes = preload("res://scripts/slot-type-enum.gd")
 
 var default_tex = preload("res://item_slot_default_background.png")
 var empty_tex = preload("res://item_slot_empty_background.png")
@@ -11,14 +14,6 @@ var selected_style: StyleBoxTexture = null
 var ItemClass = preload("res://Item.tscn")
 var item = null
 var slot_index
-
-enum SlotType {
-	HOTBAR = 0,
-	INVENTORY,
-	SHIRT,
-	PANTS,
-	SHOES,
-}
 
 var slotType = null
 
@@ -36,8 +31,7 @@ func _ready():
 	refresh_style()
 		
 func refresh_style():
-	
-	if slotType == SlotType.HOTBAR and PlayerInventory.active_item_slot == slot_index:
+	if slotType == SlotTypes.HOTBAR and PlayerInventory.active_item_slot == slot_index:
 		set('custom_styles/panel', selected_style)
 	elif item == null:
 		set('custom_styles/panel', empty_style)
