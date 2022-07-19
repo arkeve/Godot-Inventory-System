@@ -8,8 +8,8 @@ onready var _inventoryGrid = $BackgroundNinePatchRect/InventoryGrid
 onready var _equipmentGrid = $BackgroundNinePatchRect/EquipmentGrid
 onready var _background = $BackgroundNinePatchRect
 
-var _slotCount : float = 12.0
-var _columnCount : float = 3.0
+var _slotCount : float = 20.0
+var _columnCount : float = 5.0
 var _originalGrabPosition : Vector2
 var _originalDialogPosition : Vector2
 var _draggingInventory = false
@@ -17,55 +17,70 @@ var _draggingInventory = false
 func _ready():
 	InitSignals()
 	InventoryManager.SetInventory(self)
-	CreateInventory()
+	CreateInventoryGrid()
 	InitEquipment()
 	PopulateInventory()
 	PopulateEquipment()
 
 func InitSignals():
+	Signals.connect("SlotClicked", self, "SlotClicked")
 	connect("ToggleDragState", self, "ToggleDragState")
-
+	
 func AddSlot():
 	_slotCount += 1.0
-	ClearGrid()
-	CreateInventory()
+	RefreshInventory()
 
 func RemoveSlot():
 	_slotCount -= 1.0
 	if _slotCount < 0.0:
 		_slotCount = 0.0
-	ClearGrid()
-	CreateInventory()
+	
+	var slot = _inventoryGrid.get_child(_inventoryGrid.get_child_count() - 1)
+	_inventoryGrid.remove_child(slot)
+	RefreshInventory()
 
 func AddColumn():
 	_columnCount += 1.0
-	ClearGrid()
-	CreateInventory()
+	RefreshInventory()
 
 func RemoveColumn():
 	_columnCount -= 1.0
 	if _columnCount < 1.0:
 		_columnCount = 1.0
-	ClearGrid()
-	CreateInventory()
+	RefreshInventory()
 	
 func ClearGrid():
 	for child in _inventoryGrid.get_children():
 		_inventoryGrid.remove_child(child)
 		child.queue_free()
-		
-func CreateInventory():
+
+func RefreshInventory():
 	if _columnCount <= 0.0:
 		_columnCount = 1.0
 	AdjustBackgroundSize()
-	CreateSlots()
-	InitSlots()
+	AdjustGridSize()
 	var leftMargin = _inventoryGrid.get_constant("hseparation")
 	var rightMargin = 8
 	var topMargin = 8
 	var slotSize = 18
 	_equipmentGrid.rect_position = Vector2(leftMargin, topMargin)
 	_inventoryGrid.rect_position = Vector2(leftMargin + slotSize + rightMargin, topMargin)
+		
+func CreateInventoryGrid():
+	if _columnCount <= 0.0:
+		_columnCount = 1.0
+	AdjustBackgroundSize()
+	AdjustGridSize()
+	CreateInventorySlots()
+	var leftMargin = _inventoryGrid.get_constant("hseparation")
+	var rightMargin = 8
+	var topMargin = 8
+	var slotSize = 18
+	_equipmentGrid.rect_position = Vector2(leftMargin, topMargin)
+	_inventoryGrid.rect_position = Vector2(leftMargin + slotSize + rightMargin, topMargin)
+
+func AdjustGridSize():
+	_inventoryGrid.columns = _columnCount
 	
 func AdjustBackgroundSize():
 	var slotSize = 18
@@ -84,71 +99,79 @@ func AdjustBackgroundSize():
 		backgroundHeight = minHeight
 	_background.rect_size = Vector2(backgroundWidth, backgroundHeight)
 	
-func CreateSlots():
-	_inventoryGrid.columns = _columnCount
+func CreateInventorySlots():
 	for i in _slotCount:
 		var slot = _slotScene.instance()
-		slot.name = "Slot" + str(i + 1) # Slot1 - n
+		slot.SetSlotIndex(i)
+		slot.SetSlotName("Slot" + str(i + 1)) # Slot1 - n
+		slot.SetSlotType(SlotTypes.INVENTORY)
 		_inventoryGrid.add_child(slot)
-	
-func InitSlots():
-	var slots = _inventoryGrid.get_children()
-	for i in range(slots.size()):
-		slots[i].connect("gui_input", self, "slot_gui_input", [slots[i]])
-		slots[i].slot_index = i
-		slots[i].slotType = 1
-
+		
 func InitEquipment():
 	var equipmentSlots = _equipmentGrid.get_children()
 	for i in range(equipmentSlots.size()):
-		equipmentSlots[i].connect("gui_input", self, "slot_gui_input", [equipmentSlots[i]])
-		equipmentSlots[i].slot_index = i
-	equipmentSlots[0].slotType = SlotTypes.SHIRT
-	equipmentSlots[1].slotType = SlotTypes.PANTS
-	equipmentSlots[2].slotType = SlotTypes.SHOES
-	
+		equipmentSlots[i].SetSlotIndex(i)
+	equipmentSlots[0].SetSlotType(SlotTypes.SHIRT)
+	equipmentSlots[1].SetSlotType(SlotTypes.PANTS)
+	equipmentSlots[2].SetSlotType(SlotTypes.SHOES)
+
+# Looks at a static list of items
 func PopulateInventory():
-	var slots = _inventoryGrid.get_children()
-	for i in range(slots.size()):
+	var listOfSlots = _inventoryGrid.get_children()
+	for i in range(listOfSlots.size()):
 		if PlayerInventory.inventory.has(i):
-			slots[i].initialize_item(PlayerInventory.inventory[i][0], PlayerInventory.inventory[i][1])
+			var item = ItemManager.CreateItem(PlayerInventory.inventory[i][0], PlayerInventory.inventory[i][1])
+			listOfSlots[i].AddItem(item)
 
 func PopulateEquipment():
 	var equipmentSlots = _equipmentGrid.get_children()
 	for i in range(equipmentSlots.size()):
 		if PlayerInventory.equips.has(i):
-			equipmentSlots[i].initialize_item(PlayerInventory.equips[i][0], PlayerInventory.equips[i][1])
-
-func slot_gui_input(event: InputEvent, slot: Slot):
-	if event is InputEventMouseButton:
-		if event.button_index == BUTTON_LEFT && event.pressed:
-			if find_parent("UserInterface").holding_item != null:
-				if !slot.item:
-					left_click_empty_slot(slot)
+			var item = ItemManager.CreateItem(PlayerInventory.equips[i][0], PlayerInventory.equips[i][1])
+			equipmentSlots[i].AddItem(item)			
+	
+#			add_child(_item)
+#			refresh_style()
+	
+func SlotClicked(slot: Slot):
+	var slotItem = slot.GetItemReference()
+	var heldItemRef = InventoryManager.GetHeldItemReference()
+	if heldItemRef != null && is_instance_valid(heldItemRef):
+		if slotItem != null && is_instance_valid(slotItem):
+			if !slot.GetItemReference():
+				left_click_empty_slot(slot)
+			else:
+				if find_parent("UserInterface").holding_item.GetItemName() != slot.GetItemReference().GetItemName():
+					left_click_different_item(slot)
 				else:
-					if find_parent("UserInterface").holding_item.item_name != slot.item.item_name:
-						left_click_different_item(event, slot)
-					else:
-						left_click_same_item(slot)
-			elif slot.item:
-				left_click_not_holding(slot)
-				
+					left_click_same_item(slot)
+		else:
+			var heldItem = InventoryManager.TakeHeldItem()
+			slot.AddItem(heldItem)
+	elif slot.GetItemReference():
+		var item = slot.TakeItem()
+		InventoryManager.HoldItem(item)
+		UpdateHeldItemPosition()
+
+func UpdateHeldItemPosition():
+	var heldItem = InventoryManager.GetHeldItemReference()
+	if heldItem != null && is_instance_valid(heldItem) && heldItem.is_inside_tree():
+		InventoryManager.GetHeldItemReference().global_position = get_global_mouse_position()
+			
 func _input(__event):
-	if find_parent("UserInterface").holding_item:
-		find_parent("UserInterface").holding_item.global_position = get_global_mouse_position()
-		
-		
+	UpdateHeldItemPosition()
+
 func able_to_put_into_slot(slot: Slot):
 	var holding_item = find_parent("UserInterface").holding_item
 	if holding_item == null:
 		return true
-	var holding_item_category = JsonData.item_data[holding_item.item_name]["ItemCategory"]
+	var holding_item_category = JsonData.item_data[holding_item.GetItemName()]["ItemCategory"]
 	
-	if slot.slotType == SlotTypes.SHIRT:
+	if slot.GetSlotType() == SlotTypes.SHIRT:
 		return holding_item_category == "Shirt"
-	elif slot.slotType == SlotTypes.PANTS:
+	elif slot.GetSlotType() == SlotTypes.PANTS:
 		return holding_item_category == "Pants"
-	elif slot.slotType == SlotTypes.SHOES:
+	elif slot.GetSlotType() == SlotTypes.SHOES:
 		return holding_item_category == "Shoes"
 	return true
 		
@@ -158,35 +181,35 @@ func left_click_empty_slot(slot: Slot):
 		slot.putIntoSlot(find_parent("UserInterface").holding_item)
 		find_parent("UserInterface").holding_item = null
 	
-func left_click_different_item(event: InputEvent, slot: Slot):
+func left_click_different_item(slot: Slot):
 	if able_to_put_into_slot(slot):
 		PlayerInventory.remove_item(slot)
 		PlayerInventory.add_item_to_empty_slot(find_parent("UserInterface").holding_item, slot)
-		var temp_item = slot.item
+		var temp_item = slot.GetItemReference()
 		slot.pickFromSlot()
-		temp_item.global_position = event.global_position
+		temp_item.global_position = slot.global_position
 		slot.putIntoSlot(find_parent("UserInterface").holding_item)
 		find_parent("UserInterface").holding_item = temp_item
 
 func left_click_same_item(slot: Slot):
 	if able_to_put_into_slot(slot):
-		var stack_size = int(JsonData.item_data[slot.item.item_name]["StackSize"])
-		var able_to_add = stack_size - slot.item.item_quantity
-		if able_to_add >= find_parent("UserInterface").holding_item.item_quantity:
-			PlayerInventory.add_item_quantity(slot, find_parent("UserInterface").holding_item.item_quantity)
-			slot.item.add_item_quantity(find_parent("UserInterface").holding_item.item_quantity)
+		var stack_size = int(JsonData.item_data[slot.GetItemReference().GetItemName()]["MaxStackSize"])
+		var able_to_add = stack_size - slot.GetItemReference().GetItemCount()
+		if able_to_add >= find_parent("UserInterface").holding_item.GetItemCount():
+			PlayerInventory.add_item_quantity(slot, find_parent("UserInterface").holding_item.GetItemCount())
+			slot.GetItemReference().add_item_quantity(find_parent("UserInterface").holding_item.GetItemCount())
 			find_parent("UserInterface").holding_item.queue_free()
 			find_parent("UserInterface").holding_item = null
 		else:
 			PlayerInventory.add_item_quantity(slot, able_to_add)
-			slot.item.add_item_quantity(able_to_add)
+			slot.GetItemReference().add_item_quantity(able_to_add)
 			find_parent("UserInterface").holding_item.decrease_item_quantity(able_to_add)
 		
-func left_click_not_holding(slot: Slot):
-	PlayerInventory.remove_item(slot)
-	find_parent("UserInterface").holding_item = slot.item
-	slot.pickFromSlot()
-	find_parent("UserInterface").holding_item.global_position = get_global_mouse_position()
+#func TakeItemFromSlot(slot: Slot):
+#	var item = slot.TakeItem()
+#	find_parent("UserInterface").holding_item = slot.GetItemReference()
+#	slot.pickFromSlot()
+#	find_parent("UserInterface").holding_item.global_position = get_global_mouse_position()
 
 func _process(_delta):
 	if _draggingInventory:

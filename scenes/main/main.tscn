@@ -6,12 +6,12 @@
 [ext_resource path="res://scenes/inventory/inventory.tscn" type="PackedScene" id=4]
 [ext_resource path="res://ItemDrop.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Hotbar.tscn" type="PackedScene" id=6]
-[ext_resource path="res://world.gd" type="Script" id=7]
+[ext_resource path="res://scenes/main/main.gd" type="Script" id=7]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 270.776, 10 )
 
-[node name="World" type="Node2D"]
+[node name="Main" type="Node2D"]
 script = ExtResource( 7 )
 
 [node name="Ground" type="StaticBody2D" parent="."]
@@ -37,9 +37,10 @@ position = Vector2( 339.842, 184.575 )
 script = ExtResource( 3 )
 
 [node name="Inventory" parent="UserInterface" instance=ExtResource( 4 )]
-visible = false
 
 [node name="Hotbar" parent="UserInterface" instance=ExtResource( 6 )]
+
+[node name="TransferItemContainer" type="Node2D" parent="UserInterface"]
 
 [node name="ItemDrop" parent="." instance=ExtResource( 5 )]
 position = Vector2( 167.538, 79.2855 )

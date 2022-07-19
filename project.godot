@@ -9,19 +9,25 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Node2D",
+"class": "Item",
+"language": "GDScript",
+"path": "res://scenes/item/item.gd"
+}, {
 "base": "Panel",
 "class": "Slot",
 "language": "GDScript",
 "path": "res://scenes/slot/slot.gd"
 } ]
 _global_script_class_icons={
+"Item": "",
 "Slot": ""
 }
 
 [application]
 
 config/name="InventorySystem"
-run/main_scene="res://World.tscn"
+run/main_scene="res://scenes/main/main.tscn"
 
 [autoload]
 
@@ -30,6 +36,8 @@ PlayerInventory="*res://PlayerInventory.gd"
 Common="*res://singletons/common.gd"
 Signals="*res://singletons/signals.gd"
 InventoryManager="*res://singletons/inventory_manager.gd"
+ItemManager="*res://singletons/item_manager.gd"
+GameManager="*res://singletons/game-manager.gd"
 
 [debug]
 

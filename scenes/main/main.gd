@@ -1,5 +1,13 @@
 extends Node2D
 
+
+
+func _ready():
+	randomize()
+	GameManager.SetMain(self)
+
+
+	
 func AddSlot():
 	InventoryManager.GetInventory().AddSlot()
 

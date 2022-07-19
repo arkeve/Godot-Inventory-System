@@ -7,7 +7,7 @@
 texture = ExtResource( 1 )
 region_rect = Rect2( 0, 0, 18, 18 )
 
-[node name="SlotPanel" type="Panel"]
+[node name="Slot" type="Panel"]
 margin_right = 18.0
 margin_bottom = 18.0
 rect_min_size = Vector2( 18, 18 )
@@ -16,3 +16,11 @@ script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="SliderContainer" type="Node2D" parent="."]
+z_index = 2
+z_as_relative = false
+
+[node name="ItemContainer" type="Node2D" parent="."]
+
+[connection signal="gui_input" from="." to="." method="_on_Slot_gui_input"]
