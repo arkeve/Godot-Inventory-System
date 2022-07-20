@@ -214,6 +214,11 @@ func StackItems(slot: Slot):
 			heldItem = InventoryManager.TakeHeldItem()
 			heldItem.queue_free()
 
+func GetFirstAvailableSlot():
+	for slot in _inventoryGrid.get_children():
+		if slot.GetItemReference() == null:
+			return slot
+	
 func _process(_delta):
 	if _draggingInventory:
 		var mousePosition = get_viewport().get_mouse_position()

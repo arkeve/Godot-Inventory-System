@@ -30,4 +30,9 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="SlideTimer" type="Timer" parent="."]
+wait_time = 0.3
+one_shot = true
+
 [connection signal="gui_input" from="." to="." method="_on_Slot_gui_input"]
+[connection signal="timeout" from="SlideTimer" to="." method="_on_SlideTimer_timeout"]

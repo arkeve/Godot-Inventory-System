@@ -22,7 +22,9 @@ func GetValue():
 	return _slider.value
 
 func SetLabelPosition(value):
-	$Spliiter.position.y = value
+	$Splitter.position.y = value
+	if $Splitter.position.y > 16:
+		$Splitter.position.y = 16
 
 func SetLabelText(value):
-	$Spliiter/SplitAmountLabel.text = str(value)
+	$Splitter/SplitAmountLabel.text = str(value)

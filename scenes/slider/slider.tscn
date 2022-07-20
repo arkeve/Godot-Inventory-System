@@ -19,9 +19,9 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Spliiter" type="Node2D" parent="."]
+[node name="Splitter" type="Node2D" parent="."]
 
-[node name="ColorRect" type="ColorRect" parent="Spliiter"]
+[node name="ColorRect" type="ColorRect" parent="Splitter"]
 margin_top = 1.0
 margin_right = 25.0
 margin_bottom = 16.0
@@ -30,7 +30,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="SplitAmountLabel" type="Label" parent="Spliiter"]
+[node name="SplitAmountLabel" type="Label" parent="Splitter"]
 margin_right = 26.0
 margin_bottom = 16.0
 custom_fonts/font = SubResource( 1 )

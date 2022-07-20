@@ -1,6 +1,5 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://default_inventory_background.png" type="Texture" id=3]
 [ext_resource path="res://images/PantsOverlay.png" type="Texture" id=4]
 [ext_resource path="res://images/ShoesOverlay.png" type="Texture" id=5]
 [ext_resource path="res://images/ShirtOverlay.png" type="Texture" id=6]
@@ -14,7 +13,7 @@ script = ExtResource( 7 )
 [node name="BackgroundNinePatchRect" type="NinePatchRect" parent="."]
 margin_right = 17.0
 margin_bottom = 15.0
-mouse_filter = 0
+mouse_filter = 1
 texture = ExtResource( 8 )
 patch_margin_left = 5
 patch_margin_top = 5
@@ -25,6 +24,7 @@ __meta__ = {
 }
 
 [node name="InventoryGrid" type="GridContainer" parent="BackgroundNinePatchRect"]
+mouse_filter = 2
 custom_constants/vseparation = 4
 custom_constants/hseparation = 4
 columns = 5
@@ -77,17 +77,6 @@ margin_top = -43.0
 margin_right = 17.0
 margin_bottom = -27.0
 texture = ExtResource( 5 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="BackgroundTextureRect" type="TextureRect" parent="."]
-visible = false
-margin_left = 117.558
-margin_top = 78.7939
-margin_right = 324.558
-margin_bottom = 190.794
-texture = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }

@@ -7,7 +7,11 @@ func _start():
 
 func InitSignals():
 	Signals.connect("HoldItem", self, "HoldItem")
-	
+
+func UserRightClicked():
+	if GetHeldItemReference() != null:
+		GetInventory().AddItem(TakeHeldItem())
+
 func SetInventory(inventory):
 	_inventory = inventory
 
