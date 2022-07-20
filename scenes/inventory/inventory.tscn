@@ -1,13 +1,14 @@
 [gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://images/PantsOverlay.png" type="Texture" id=4]
-[ext_resource path="res://images/ShoesOverlay.png" type="Texture" id=5]
-[ext_resource path="res://images/ShirtOverlay.png" type="Texture" id=6]
+[ext_resource path="res://assets/other/PantsOverlay.png" type="Texture" id=4]
+[ext_resource path="res://assets/other/ShoesOverlay.png" type="Texture" id=5]
+[ext_resource path="res://assets/other/ShirtOverlay.png" type="Texture" id=6]
 [ext_resource path="res://scenes/inventory/inventory.gd" type="Script" id=7]
-[ext_resource path="res://images/inventory-nine-patch-background.png" type="Texture" id=8]
+[ext_resource path="res://assets/other/inventory-nine-patch-background.png" type="Texture" id=8]
 [ext_resource path="res://scenes/slot/slot.tscn" type="PackedScene" id=9]
 
 [node name="Inventory" type="Node2D"]
+visible = false
 script = ExtResource( 7 )
 
 [node name="BackgroundNinePatchRect" type="NinePatchRect" parent="."]
@@ -33,6 +34,7 @@ __meta__ = {
 }
 
 [node name="EquipmentGrid" type="GridContainer" parent="BackgroundNinePatchRect"]
+visible = false
 margin_right = 18.0
 margin_bottom = 62.0
 custom_constants/vseparation = 4

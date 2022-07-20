@@ -13,18 +13,30 @@ var _columnCount : float = 5.0
 var _originalGrabPosition : Vector2
 var _originalDialogPosition : Vector2
 var _draggingInventory = false
+var _isIncludingEquipment = false
+var _equipmentWidth = 0
 
 func _ready():
 	InitSignals()
-	InventoryManager.SetInventory(self)
-	CreateInventoryGrid()
-	InitEquipment()
-	PopulateInventory()
-	PopulateEquipment()
 
 func InitSignals():
 	Signals.connect("SlotClicked", self, "SlotClicked")
 	connect("ToggleDragState", self, "ToggleDragState")
+
+func ConfigureInventory(slotCount = _slotCount, columnCount = _columnCount, includeEquipment = false, equipmentWidth = 64):
+	_slotCount = slotCount
+	_columnCount = columnCount
+	#InventoryManager.SetInventory(self)
+	CreateInventoryGrid()
+#	PopulateInventory()
+	_isIncludingEquipment = includeEquipment
+	_equipmentWidth = equipmentWidth
+	if _isIncludingEquipment:
+		IncludeEquipment()
+
+func IncludeEquipment():
+	InitEquipment()
+	PopulateEquipment()
 	
 func AddSlot():
 	_slotCount += 1.0
@@ -64,22 +76,18 @@ func RefreshInventory():
 	var leftMargin = _inventoryGrid.get_constant("hseparation")
 	var rightMargin = 8
 	var topMargin = 8
-	var slotSize = 18
+	var slotSize = 0
+	if _isIncludingEquipment:
+		slotSize = 18
+	var offsetX = leftMargin
 	_equipmentGrid.rect_position = Vector2(leftMargin, topMargin)
-	_inventoryGrid.rect_position = Vector2(leftMargin + slotSize + rightMargin, topMargin)
+	if _isIncludingEquipment:
+		offsetX = leftMargin + slotSize + rightMargin
+	_inventoryGrid.rect_position = Vector2(offsetX, topMargin)
 		
 func CreateInventoryGrid():
-	if _columnCount <= 0.0:
-		_columnCount = 1.0
-	AdjustBackgroundSize()
-	AdjustGridSize()
 	CreateInventorySlots()
-	var leftMargin = _inventoryGrid.get_constant("hseparation")
-	var rightMargin = 8
-	var topMargin = 8
-	var slotSize = 18
-	_equipmentGrid.rect_position = Vector2(leftMargin, topMargin)
-	_inventoryGrid.rect_position = Vector2(leftMargin + slotSize + rightMargin, topMargin)
+	RefreshInventory()
 
 func AdjustGridSize():
 	_inventoryGrid.columns = _columnCount
@@ -89,17 +97,31 @@ func AdjustBackgroundSize():
 	var leftMargin = _inventoryGrid.get_constant("hseparation")
 	var rightMargin = 8
 	var topMargin = 8
-	var equipmentVSeparation = _equipmentGrid.get_constant("vseparation")
-	var equipmentSlotsWidth = slotSize
-	var totalEquipmentWidth = leftMargin + equipmentSlotsWidth + rightMargin
-	var equipmentSlotCount = 3
-	var minHeight = topMargin + (equipmentSlotCount * slotSize) + (equipmentSlotCount * equipmentVSeparation)
-	var backgroundWidth = totalEquipmentWidth + (_columnCount * slotSize) + (_inventoryGrid.get_constant("hseparation") * (_columnCount))
+	var equipmentVSeparation = 0
+	var equipmentSlotsWidth = 0
+	var totalEquipmentWidth = 0
+	var equipmentSlotCount = 0
+	var minHeight = 0 
+	if _isIncludingEquipment:
+		equipmentVSeparation = _equipmentGrid.get_constant("vseparation")
+		equipmentSlotsWidth = slotSize
+		totalEquipmentWidth = equipmentSlotsWidth + rightMargin
+		equipmentSlotCount = 3
+		minHeight = topMargin + (equipmentSlotCount * slotSize) + (equipmentSlotCount * equipmentVSeparation)
+	var backgroundWidth = leftMargin + totalEquipmentWidth + (_columnCount * slotSize) + (_inventoryGrid.get_constant("hseparation") * (_columnCount))
 	var calculatedRowCount = ceil(_slotCount / _columnCount) # 15 rounds up to 16
 	var backgroundHeight = topMargin + (calculatedRowCount * slotSize) + (_inventoryGrid.get_constant("vseparation") * calculatedRowCount)
 	if backgroundHeight < minHeight:
 		backgroundHeight = minHeight
 	_background.rect_size = Vector2(backgroundWidth, backgroundHeight)
+
+func GetWidth():
+	var width = 128
+	return width
+
+func GetHeight():
+	var height = 64
+	return height
 	
 func CreateInventorySlots():
 	for i in _slotCount:
@@ -126,15 +148,17 @@ func PopulateInventory():
 	var listOfSlots = _inventoryGrid.get_children()
 	for i in range(listOfSlots.size()):
 		if PlayerInventory.inventory.has(i):
-			var item = ItemManager.CreateItem(PlayerInventory.inventory[i][0], PlayerInventory.inventory[i][1])
+			var item = ItemManager.CreateItem()
 			listOfSlots[i].AddItem(item)
+			item.ConfigureItem(PlayerInventory.inventory[i][0], PlayerInventory.inventory[i][1])
 
 func PopulateEquipment():
 	var equipmentSlots = _equipmentGrid.get_children()
 	for i in range(equipmentSlots.size()):
 		if PlayerInventory.equips.has(i):
-			var item = ItemManager.CreateItem(PlayerInventory.equips[i][0], PlayerInventory.equips[i][1])
-			equipmentSlots[i].AddItem(item)			
+			var item = ItemManager.CreateItem()
+			equipmentSlots[i].AddItem(item)
+			item.ConfigureItem(PlayerInventory.equips[i][0], PlayerInventory.equips[i][1])
 	
 #			add_child(_item)
 #			refresh_style()
@@ -218,6 +242,15 @@ func GetFirstAvailableSlot():
 	for slot in _inventoryGrid.get_children():
 		if slot.GetItemReference() == null:
 			return slot
+
+func ShowInventory():
+	visible = true
+
+func HideInventory():
+	visible = false
+
+func IsShowing():
+	return visible
 	
 func _process(_delta):
 	if _draggingInventory:
@@ -230,6 +263,7 @@ func _process(_delta):
 		_originalGrabPosition = Vector2(0, 0)
 		
 func ToggleDragState():
+	InventoryManager.SetActiveInventory(self)
 	_draggingInventory =! _draggingInventory
 
 func _on_BackgroundNinePatchRect_gui_input(event):

@@ -5,9 +5,9 @@ signal ToggleSplitStackState
 const SlotTypes = preload("res://scripts/slot-type-enum.gd")
 
 onready var _sliderScene = preload("res://scenes/slider/slider.tscn")
-var default_tex = preload("res://item_slot_default_background.png")
-var empty_tex = preload("res://item_slot_empty_background.png")
-var selected_tex = preload("res://images/item_slot_selected_background.png")
+var default_tex = preload("res://assets/other/item_slot_default_background.png")
+var empty_tex = preload("res://assets/other/item_slot_empty_background.png")
+var selected_tex = preload("res://assets/other/item_slot_selected_background.png")
 
 onready var _itemContainer = $ItemContainer
 
@@ -35,6 +35,8 @@ func InitSignals():
 	connect("ToggleSplitStackState", self, "ToggleSplitStackState")
 	
 func AddItem(item):
+	if item == null:
+		return
 	_itemContainer.add_child(item)
 	item.position = Vector2(0, 0)
 	RefreshStyle()
@@ -92,9 +94,8 @@ func _process(_delta):
 		_slider.SetLabelPosition(deltaY)
 		_slider.SetLabelText(str(_slider.GetValue()))
 
-
 func RefreshStyle():
-	if _slotType == SlotTypes.HOTBAR and PlayerInventory.active_item_slot == slot_index:
+	if _slotType == SlotTypes.HOTBAR and InventoryManager._activeItemSlot == slot_index:
 		set('custom_styles/panel', selected_style)
 	elif GetItemReference() == null:
 		set('custom_styles/panel', empty_style)
@@ -115,8 +116,9 @@ func SplitStack():
 		return
 		
 	var itemInSlot = GetItemReference()
-	var item = ItemManager.CreateItem(itemInSlot.GetItemName(), _slider.GetValue())
+	var item = ItemManager.CreateItem()
 	InventoryManager.HoldItem(item)
+	item.ConfigureItem(itemInSlot.GetItemName(), _slider.GetValue())
 	GetItemReference().SetItemCount(GetItemReference().GetItemCount() - _slider.GetValue())
 	if GetItemReference().GetItemCount() <= 0:
 		var emptyItem = TakeItem()
@@ -146,7 +148,7 @@ func _on_Slot_gui_input(event):
 				set_process(false)
 				if _slider != null && is_instance_valid(_slider):
 					_slider.queue_free()
-				var slot = InventoryManager.GetInventory().GetFirstAvailableSlot()
+				var slot = InventoryManager.GetActiveInventory().GetFirstAvailableSlot()
 				if is_instance_valid(slot):
 					slot.AddItem(InventoryManager.TakeHeldItem())
 				

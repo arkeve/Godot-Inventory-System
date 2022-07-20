@@ -1,9 +1,11 @@
 extends Node2D
 class_name Item
+onready var _stackSizeLabel = $StackSizeLabel
 var _itemName = ""
 var _itemCount = 0
 var _maxStackSize = 1
 var _splittable = false
+var _inInventory = true
 
 func _ready():
 	pass
@@ -11,7 +13,7 @@ func _ready():
 func ConfigureItem(itemName, itemCount):
 	_itemName = itemName
 	_itemCount = itemCount
-	$TextureRect.texture = load("res://item_icons/" + _itemName + ".png")
+	$TextureRect.texture = load("res://assets/items/" + _itemName + ".png")
 	
 	_maxStackSize = int(JsonData.item_data[_itemName]["MaxStackSize"])
 	if _maxStackSize > 1:
@@ -19,16 +21,15 @@ func ConfigureItem(itemName, itemCount):
 	RefreshItemCountLabel()
 	
 func RefreshItemCountLabel():
-	print("RefreshItemCountLabel:" + str(_itemCount))
 	if _itemCount == 1:
-		$Label.visible = false
+		_stackSizeLabel.visible = false
 	else:
 		if _itemCount > _maxStackSize:
 			_itemCount = _maxStackSize
 			print("Yo, itemCount can't be larger than our item definitions maxStackSize. Change one.")
 			
-		$Label.visible = true
-	$Label.text = String(_itemCount)
+		_stackSizeLabel.visible = true
+	_stackSizeLabel.text = String(_itemCount)
 		
 func AddToStack(amount):
 	_itemCount += amount
@@ -50,3 +51,4 @@ func GetItemCount():
 
 func GetMaxStackSize():
 	return _maxStackSize
+

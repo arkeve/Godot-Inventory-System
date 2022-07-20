@@ -1,5 +1,4 @@
 extends CanvasLayer
-var holding_item = null
 
 onready var _transferItemContainer = $TransferItemContainer
 
@@ -9,6 +8,9 @@ func _ready():
 	
 func InitSignals():
 	pass
+
+func AddInventory(inventory):
+	$InventoryContainer.add_child(inventory)
 
 # So the item automatically floats above all else
 func AddItemForTransfer(item):
@@ -28,7 +30,7 @@ func TakeHeldItem():
 	
 func _input(event):
 	if event.is_action_pressed("inventory"):
-		$Inventory.visible = !$Inventory.visible
+		InventoryManager.GetActiveInventory().visible = !InventoryManager.GetActiveInventory()
 	
 	if event.is_action_pressed("scroll_up"):
 		PlayerInventory.active_item_scroll_down()

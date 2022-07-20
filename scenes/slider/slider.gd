@@ -2,10 +2,6 @@ extends Node2D
 
 onready var _slider = $VSlider
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
-
 func SetStepValue(value):
 	_slider.step = value
 	
