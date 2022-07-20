@@ -28,6 +28,8 @@ func InitSignals():
 	
 func AddSlot():
 	_slotCount += 1.0
+	# slots start at 0
+	CreateSlot(_slotCount - 1)
 	RefreshInventory()
 
 func RemoveSlot():
@@ -101,12 +103,16 @@ func AdjustBackgroundSize():
 	
 func CreateInventorySlots():
 	for i in _slotCount:
-		var slot = _slotScene.instance()
-		slot.SetSlotIndex(i)
-		slot.SetSlotName("Slot" + str(i + 1)) # Slot1 - n
-		slot.SetSlotType(SlotTypes.INVENTORY)
-		_inventoryGrid.add_child(slot)
-		
+		CreateSlot(i)
+
+func CreateSlot(slotIndex):
+	var slot = _slotScene.instance()
+	slot.SetSlotIndex(slotIndex)
+	slot.SetSlotName("Slot" + str(slotIndex + 1)) # Slot1 - n
+	slot.SetSlotType(SlotTypes.INVENTORY)
+	slot.AddIndexText(str(slotIndex))
+	_inventoryGrid.add_child(slot)
+			
 func InitEquipment():
 	var equipmentSlots = _equipmentGrid.get_children()
 	for i in range(equipmentSlots.size()):
@@ -137,14 +143,23 @@ func SlotClicked(slot: Slot):
 	var slotItem = slot.GetItemReference()
 	var heldItemRef = InventoryManager.GetHeldItemReference()
 	if heldItemRef != null && is_instance_valid(heldItemRef):
+		# I'm holding something
 		if slotItem != null && is_instance_valid(slotItem):
-			if !slot.GetItemReference():
-				left_click_empty_slot(slot)
+			# The slot I'm dropping on has something already
+			if heldItemRef.GetItemName() == slot.GetItemReference().GetItemName():
+				# items types are the same. Try to stack
+				StackItems(slot)
 			else:
-				if find_parent("UserInterface").holding_item.GetItemName() != slot.GetItemReference().GetItemName():
-					left_click_different_item(slot)
-				else:
-					left_click_same_item(slot)
+				# item types are different. Swap them
+				SwapItems(slot)
+				
+#			if !slot.GetItemReference():
+#				left_click_empty_slot(slot)
+#			else:
+#				if find_parent("UserInterface").holding_item.GetItemName() != slot.GetItemReference().GetItemName():
+					
+#				else:
+					
 		else:
 			var heldItem = InventoryManager.TakeHeldItem()
 			slot.AddItem(heldItem)
@@ -161,55 +176,43 @@ func UpdateHeldItemPosition():
 func _input(__event):
 	UpdateHeldItemPosition()
 
-func able_to_put_into_slot(slot: Slot):
-	var holding_item = find_parent("UserInterface").holding_item
-	if holding_item == null:
-		return true
-	var holding_item_category = JsonData.item_data[holding_item.GetItemName()]["ItemCategory"]
+func IsItemTypeAllowedInSlot(slot: Slot):
+	var heldItem = InventoryManager.GetHeldItemReference()
+	var heldItemCategory = JsonData.item_data[heldItem.GetItemName()]["ItemCategory"]
 	
 	if slot.GetSlotType() == SlotTypes.SHIRT:
-		return holding_item_category == "Shirt"
+		if heldItemCategory != "Shirt":
+			return false
 	elif slot.GetSlotType() == SlotTypes.PANTS:
-		return holding_item_category == "Pants"
+		if heldItemCategory != "Pants":
+			return false
 	elif slot.GetSlotType() == SlotTypes.SHOES:
-		return holding_item_category == "Shoes"
-	return true
-		
-func left_click_empty_slot(slot: Slot):
-	if able_to_put_into_slot(slot):
-		PlayerInventory.add_item_to_empty_slot(find_parent("UserInterface").holding_item, slot)
-		slot.putIntoSlot(find_parent("UserInterface").holding_item)
-		find_parent("UserInterface").holding_item = null
-	
-func left_click_different_item(slot: Slot):
-	if able_to_put_into_slot(slot):
-		PlayerInventory.remove_item(slot)
-		PlayerInventory.add_item_to_empty_slot(find_parent("UserInterface").holding_item, slot)
-		var temp_item = slot.GetItemReference()
-		slot.pickFromSlot()
-		temp_item.global_position = slot.global_position
-		slot.putIntoSlot(find_parent("UserInterface").holding_item)
-		find_parent("UserInterface").holding_item = temp_item
+		if heldItemCategory != "Shoes":
+			return false
 
-func left_click_same_item(slot: Slot):
-	if able_to_put_into_slot(slot):
-		var stack_size = int(JsonData.item_data[slot.GetItemReference().GetItemName()]["MaxStackSize"])
-		var able_to_add = stack_size - slot.GetItemReference().GetItemCount()
-		if able_to_add >= find_parent("UserInterface").holding_item.GetItemCount():
-			PlayerInventory.add_item_quantity(slot, find_parent("UserInterface").holding_item.GetItemCount())
-			slot.GetItemReference().add_item_quantity(find_parent("UserInterface").holding_item.GetItemCount())
-			find_parent("UserInterface").holding_item.queue_free()
-			find_parent("UserInterface").holding_item = null
+	return true
+	
+func SwapItems(slot: Slot):
+	if IsItemTypeAllowedInSlot(slot):
+		var slotItem = slot.TakeItem()
+		var heldItem = InventoryManager.TakeHeldItem()
+		slot.AddItem(heldItem)
+		InventoryManager.HoldItem(slotItem)
+		UpdateHeldItemPosition()
+
+func StackItems(slot: Slot):
+	if IsItemTypeAllowedInSlot(slot):
+		var existingItem = slot.GetItemReference()
+		var existingItemCount = existingItem.GetItemCount()
+		var heldItem = InventoryManager.GetHeldItemReference()
+		var amountWeCanAdd = heldItem.GetMaxStackSize() - existingItemCount
+		if heldItem.GetItemCount() > amountWeCanAdd:
+			existingItem.AddToStack(amountWeCanAdd)
+			heldItem.RemoveFromStack(amountWeCanAdd)
 		else:
-			PlayerInventory.add_item_quantity(slot, able_to_add)
-			slot.GetItemReference().add_item_quantity(able_to_add)
-			find_parent("UserInterface").holding_item.decrease_item_quantity(able_to_add)
-		
-#func TakeItemFromSlot(slot: Slot):
-#	var item = slot.TakeItem()
-#	find_parent("UserInterface").holding_item = slot.GetItemReference()
-#	slot.pickFromSlot()
-#	find_parent("UserInterface").holding_item.global_position = get_global_mouse_position()
+			existingItem.AddToStack(heldItem.GetItemCount())
+			heldItem = InventoryManager.TakeHeldItem()
+			heldItem.queue_free()
 
 func _process(_delta):
 	if _draggingInventory:

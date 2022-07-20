@@ -6,25 +6,8 @@ var _maxStackSize = 1
 var _splittable = false
 
 func _ready():
-#	var rand_val = randi() % 3
-#	if rand_val == 0:
-#		_itemName = "Iron Sword"
-#	elif rand_val == 1:
-#		_itemName = "Tree Branch"
-#	else:
-#		_itemName = "Slime Potion"
-#		_splittable = true
-#
-#	$TextureRect.texture = load("res://item_icons/" + _itemName + ".png")
-#	_itemCount = int(JsonData.item_data[_itemName]["MaxStackSize"])
-#	_itemCount = randi() % _itemCount + 1
-#
-#	if _itemCount == 1:
-#		$Label.visible = false
-#	else:
-#		$Label.text = String(_itemCount)
 	pass
-	
+		
 func ConfigureItem(itemName, itemCount):
 	_itemName = itemName
 	_itemCount = itemCount
@@ -33,7 +16,10 @@ func ConfigureItem(itemName, itemCount):
 	_maxStackSize = int(JsonData.item_data[_itemName]["MaxStackSize"])
 	if _maxStackSize > 1:
 		_splittable = bool(JsonData.item_data[_itemName]["Splittable"])
+	RefreshItemCountLabel()
 	
+func RefreshItemCountLabel():
+	print("RefreshItemCountLabel:" + str(_itemCount))
 	if _itemCount == 1:
 		$Label.visible = false
 	else:
@@ -42,18 +28,25 @@ func ConfigureItem(itemName, itemCount):
 			print("Yo, itemCount can't be larger than our item definitions maxStackSize. Change one.")
 			
 		$Label.visible = true
-		$Label.text = String(_itemCount)
+	$Label.text = String(_itemCount)
 		
-func add_item_quantity(amount):
+func AddToStack(amount):
 	_itemCount += amount
-	$Label.text = String(_itemCount)
+	RefreshItemCountLabel()
 	
-func decrease_item_quantity(amount):
+func RemoveFromStack(amount):
 	_itemCount -= amount
-	$Label.text = String(_itemCount)
+	RefreshItemCountLabel()
 
+func SetItemCount(amount):
+	_itemCount = amount
+	RefreshItemCountLabel()
+	
 func GetItemName():
 	return _itemName
 	
 func GetItemCount():
 	return _itemCount
+
+func GetMaxStackSize():
+	return _maxStackSize

@@ -67,22 +67,31 @@ func GetSlotType():
 	
 func GetSlotIndex():
 	return slot_index
+
+func AddIndexText(value):
+	$IndexLabel.text = value
 	
 func ToggleSplitStackState():
 	_splittingStack =! _splittingStack
 	if !_splittingStack:
-		print(str(_slider.GetValue()))
+		if _slider.GetValue() == 0:
+			_slider.queue_free()
+			return
+		var itemInSlot = GetItemReference()
+		var item = ItemManager.CreateItem(itemInSlot.GetItemName(), _slider.GetValue())
+		InventoryManager.HoldItem(item)
+		GetItemReference().SetItemCount(GetItemReference().GetItemCount() - _slider.GetValue())
+		if GetItemReference().GetItemCount() <= 0:
+			var emptyItem = TakeItem()
+			emptyItem.queue_free()
 		_slider.queue_free()
 	elif _slider == null || !is_instance_valid(_slider):
 		_slider = _sliderScene.instance()
 		$SliderContainer.add_child(_slider)
 		_midY = get_viewport().get_mouse_position().y
 		_slider.SetMaxValue(GetItemReference().GetItemCount())
-		_slider.SetMinValue(1)
-		var currentValue = GetItemReference().GetItemCount() / 2
-		if currentValue < 1:
-			currentValue = 1
-		_slider.SetValue(currentValue)
+		_slider.SetMinValue(0)
+		_slider.SetValue(0)
 
 func _process(_delta):
 	var currentY = get_viewport().get_mouse_position().y
@@ -90,8 +99,8 @@ func _process(_delta):
 		var lowerRange = GetItemReference().GetItemCount() / 2
 		var deltaY = _midY - currentY
 		var newValue = deltaY * 0.05 * lowerRange
-		if newValue < 1:
-			newValue = 1
+		if newValue < 0:
+			newValue = 0
 		_slider.SetValue(newValue)
 		deltaY *= -1
 		_slider.SetLabelPosition(deltaY)
@@ -111,7 +120,9 @@ func _on_Slot_gui_input(event):
 			Signals.emit_signal("SlotClicked", self)
 		elif event.button_index == BUTTON_RIGHT and event.pressed:
 			if GetItemReference() != null && is_instance_valid(GetItemReference()) && GetItemReference()._splittable:
+				set_process(true)
 				emit_signal("ToggleSplitStackState")
 		elif event.button_index == BUTTON_RIGHT and !event.pressed:
 			if _splittingStack:
+				set_process(false)
 				emit_signal("ToggleSplitStackState")
