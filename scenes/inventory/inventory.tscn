@@ -1,0 +1,86 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://assets/other/PantsOverlay.png" type="Texture" id=4]
+[ext_resource path="res://assets/other/ShoesOverlay.png" type="Texture" id=5]
+[ext_resource path="res://assets/other/ShirtOverlay.png" type="Texture" id=6]
+[ext_resource path="res://scenes/inventory/inventory.gd" type="Script" id=7]
+[ext_resource path="res://assets/other/inventory-nine-patch-background.png" type="Texture" id=8]
+[ext_resource path="res://scenes/slot/slot.tscn" type="PackedScene" id=9]
+
+[node name="Inventory" type="Node2D"]
+visible = false
+script = ExtResource( 7 )
+
+[node name="BackgroundNinePatchRect" type="NinePatchRect" parent="."]
+margin_right = 17.0
+margin_bottom = 15.0
+mouse_filter = 1
+texture = ExtResource( 8 )
+patch_margin_left = 5
+patch_margin_top = 5
+patch_margin_right = 5
+patch_margin_bottom = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="InventoryGrid" type="GridContainer" parent="BackgroundNinePatchRect"]
+mouse_filter = 2
+custom_constants/vseparation = 4
+custom_constants/hseparation = 4
+columns = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="EquipmentGrid" type="GridContainer" parent="BackgroundNinePatchRect"]
+visible = false
+margin_right = 18.0
+margin_bottom = 62.0
+custom_constants/vseparation = 4
+custom_constants/hseparation = 4
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ShirtSlot" parent="BackgroundNinePatchRect/EquipmentGrid" instance=ExtResource( 9 )]
+
+[node name="TextureRect" type="TextureRect" parent="BackgroundNinePatchRect/EquipmentGrid/ShirtSlot"]
+margin_left = 1.0
+margin_top = 23.0
+margin_right = 17.0
+margin_bottom = 39.0
+texture = ExtResource( 6 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PantsSlot2" parent="BackgroundNinePatchRect/EquipmentGrid" instance=ExtResource( 9 )]
+margin_top = 22.0
+margin_bottom = 40.0
+
+[node name="TextureRect" type="TextureRect" parent="BackgroundNinePatchRect/EquipmentGrid/PantsSlot2"]
+margin_left = 1.0
+margin_top = -43.0
+margin_right = 17.0
+margin_bottom = -27.0
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ShoesSlot2" parent="BackgroundNinePatchRect/EquipmentGrid" instance=ExtResource( 9 )]
+margin_top = 44.0
+margin_bottom = 62.0
+
+[node name="TextureRect" type="TextureRect" parent="BackgroundNinePatchRect/EquipmentGrid/ShoesSlot2"]
+margin_left = 1.0
+margin_top = -43.0
+margin_right = 17.0
+margin_bottom = -27.0
+texture = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="gui_input" from="BackgroundNinePatchRect" to="." method="_on_BackgroundNinePatchRect_gui_input"]

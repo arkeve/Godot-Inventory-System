@@ -1,0 +1,90 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://assets/other/ground.png" type="Texture" id=1]
+[ext_resource path="res://scenes/player/player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://UserInterface.gd" type="Script" id=3]
+[ext_resource path="res://scenes/action-bar/action-bar.tscn" type="PackedScene" id=6]
+[ext_resource path="res://scenes/main/main.gd" type="Script" id=7]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 270.776, 10 )
+
+[node name="Main" type="Node2D"]
+script = ExtResource( 7 )
+
+[node name="Ground" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 2147483655
+
+[node name="TextureRect" type="TextureRect" parent="Ground"]
+margin_right = 40.0
+margin_bottom = 40.0
+texture = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+position = Vector2( 222.754, 217.091 )
+shape = SubResource( 1 )
+
+[node name="UserInterface" type="CanvasLayer" parent="."]
+script = ExtResource( 3 )
+
+[node name="InventoryContainer" type="Node2D" parent="UserInterface"]
+
+[node name="Hotbar" parent="UserInterface" instance=ExtResource( 6 )]
+
+[node name="TransferItemContainer" type="Node2D" parent="UserInterface"]
+
+[node name="TestButtons" type="Node2D" parent="UserInterface"]
+
+[node name="AddColumnButton" type="Button" parent="UserInterface/TestButtons"]
+margin_left = 394.0
+margin_top = 50.0
+margin_right = 471.0
+margin_bottom = 70.0
+text = "+ Column"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RemoveColumnButton" type="Button" parent="UserInterface/TestButtons"]
+margin_left = 394.0
+margin_top = 71.0
+margin_right = 471.0
+margin_bottom = 91.0
+text = "- Column"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RemoveSlotButton" type="Button" parent="UserInterface/TestButtons"]
+margin_left = 394.0
+margin_top = 29.0
+margin_right = 471.0
+margin_bottom = 49.0
+text = "- Slot"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AddSlotButton" type="Button" parent="UserInterface/TestButtons"]
+margin_left = 394.0
+margin_top = 8.0
+margin_right = 471.0
+margin_bottom = 28.0
+text = "+ Slot"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Player" parent="." instance=ExtResource( 2 )]
+position = Vector2( 114, 190 )
+
+[node name="Interactives" type="Node2D" parent="."]
+
+[connection signal="pressed" from="UserInterface/TestButtons/AddColumnButton" to="." method="_on_AddColumnButton_pressed"]
+[connection signal="pressed" from="UserInterface/TestButtons/RemoveColumnButton" to="." method="_on_RemoveColumnButton_pressed"]
+[connection signal="pressed" from="UserInterface/TestButtons/RemoveSlotButton" to="." method="_on_RemoveSlotButton_pressed"]
+[connection signal="pressed" from="UserInterface/TestButtons/AddSlotButton" to="." method="_on_AddSlotButton_pressed"]
